@@ -24,11 +24,12 @@ const replaceTemplate = (html, el) => {
 }
 
 const server = http.createServer((req,res)=>{
-    const path = req.url
+    //Using the new URL API
     const baseURL = 'https://' + req.headers.host + '/'
-    const { searchParams } = new URL(path, baseURL)
-    console.log(searchParams[0])
-    if(path === '/overview' || path ==='/'){
+    const { pathname, searchParams } = new URL(req.url, baseURL)
+    // Reading the first param value
+    //console.log(searchParams.get('id'))
+    if(pathname === '/overview' || pathname ==='/'){
         res.writeHead(200, {
             'Content-type': 'text/html'
         })
@@ -36,12 +37,14 @@ const server = http.createServer((req,res)=>{
             replaceTemplate(templateCard,el)).join('')
         const overviewHtml = templateOverview.replace('{%PRODUCTCARDS%}', cardsHtml)
         res.end(overviewHtml)
-    }else if(path === '/product'){
+    }else if(pathname === '/product'){
+        const product = dataObject[searchParams.get('id')]
         res.writeHead(200, {
             'Content-type': 'text/html'
         })
-        res.end('sexy toto is selling products')
-    }else if(path === '/api'){
+       const output = replaceTemplate(templateProduct,product)
+        res.end(output)
+    }else if(pathname === '/api'){
         res.writeHead(200, {
             'Content-type': 'application/json'
         })
